@@ -1,5 +1,44 @@
 # MRI Registration QC
 
+<!-- brainlife-app:begin (generated from the App manifest; edit the manifest, not this block) -->
+
+> **Checks the quality of a diffusion registration by comparing fractional anisotropy maps from a fixed and a registered moving tensor dataset with similarity metrics (NMI, NCC, MSE, SSIM) and QC figures.**
+
+Reorients both images to RAS+, averages 4-D images over time, resamples the moving image into the fixed grid if needed, then computes normalised mutual information, normalised cross-correlation, mean squared error and SSIM with a qualitative label (excellent/good/fair/poor). It writes metrics.json and per-view PNG figures (fixed, moving, checkerboard with edge overlay, absolute difference), plus AFNI edge-alignment montages when AFNI is available. Use it after a registration App to check alignment; it does not change the images. This variant reads the FA maps of two tensor datasets; with thr_mask it also computes overlap metrics on thresholded masks.
+
+| | |
+|---|---|
+| 📥 **Inputs** | `neuro/tensor` ×2 |
+| 📤 **Outputs** | `generic/images` |
+| 🐳 **Container** | `gamorosino/tract_align:v1.0` |
+| ⚙️ **Resources** | 1 CPUs · 2 h walltime |
+| 🔗 **Run it** | [doi.org/10.25663/brainlife.app.925](https://doi.org/10.25663/brainlife.app.925) |
+
+#### 📥 Inputs
+
+| Input | Datatype | Required | Description |
+|---|---|---|---|
+| `tensor_moving` | `neuro/tensor` | yes | Registered (moving) tensor dataset; its FA map is compared with the fixed FA. Should already be registered to the fixed data. |
+| `tensor_fixed` | `neuro/tensor` | yes | Reference (fixed) tensor dataset; its FA map is used. |
+
+#### 📤 Outputs
+
+| Output | Datatype | Description |
+|---|---|---|
+| `figures` | `generic/images` | QC figures (PNG) for axial, coronal and sagittal views and the similarity metrics. |
+
+<details>
+<summary><b>⚙️ Parameters</b> (2)</summary>
+
+| Parameter | Type | Default | Description |
+|---|---|---|---|
+| `checkerboard_tiles` | number | `8` | A visualization that alternates patches of two images in a checkerboard pattern to highlight local alignment differences. |
+| `thr_mask` | number |  | A threshold-based mask applied to both fixed and moving images to compute overlap metrics (e.g., Dice), where a single value (LOW) selects voxels with values > LOW, and two values (LOW,HIGH) select voxels with LOW < value < HIGH. |
+
+</details>
+
+<!-- brainlife-app:end -->
+
 An automated quality-check pipeline for MRI image registration. Given a **fixed
 (reference)** image and a **moving (registered)** image — both in NIfTI format —
 the app computes four voxel-based similarity metrics and produces visual QC figures
